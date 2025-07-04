@@ -20,7 +20,7 @@ from tradingagents.agents.utils.agent_states import (
     InvestDebateState,
     RiskDebateState,
 )
-from tradingagents.dataflows.interface import set_config
+from tradingagents.dataflows.easy_data import data
 
 from .conditional_logic import ConditionalLogic
 from .setup import GraphSetup
@@ -49,7 +49,7 @@ class TradingAgentsGraph:
         self.config = config or DEFAULT_CONFIG
 
         # Update the interface's config
-        set_config(self.config)
+        data.configure(self.config)
 
         # Create necessary directories
         os.makedirs(

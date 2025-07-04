@@ -10,7 +10,7 @@ import pandas as pd
 import os
 from dateutil.relativedelta import relativedelta
 from langchain_openai import ChatOpenAI
-import tradingagents.dataflows.interface as interface
+from tradingagents.dataflows.easy_data import data
 from tradingagents.default_config import DEFAULT_CONFIG
 from langchain_core.messages import HumanMessage
 
@@ -61,7 +61,7 @@ class Toolkit:
             str: A formatted dataframe containing the latest global news from Reddit in the specified time frame.
         """
         
-        global_news_result = interface.get_reddit_global_news(curr_date, 7, 5)
+        global_news_result = data.news(query='global', date=curr_date, days=7, platform='reddit')
 
         return global_news_result
 
@@ -91,9 +91,7 @@ class Toolkit:
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
         look_back_days = (end_date - start_date).days
 
-        finnhub_news_result = interface.get_finnhub_news(
-            ticker, end_date_str, look_back_days
-        )
+        finnhub_news_result = data.news(query=ticker, date=end_date_str, days=look_back_days, platform='finnhub')
 
         return finnhub_news_result
 
@@ -115,7 +113,7 @@ class Toolkit:
             str: A formatted dataframe containing the latest news about the company on the given date
         """
 
-        stock_news_results = interface.get_reddit_company_news(ticker, curr_date, 7, 5)
+        stock_news_results = data.news(query=ticker, date=curr_date, days=7, platform='reddit')
 
         return stock_news_results
 
@@ -136,7 +134,7 @@ class Toolkit:
             str: A formatted dataframe containing the stock price data for the specified ticker symbol in the specified date range.
         """
 
-        result_data = interface.get_YFin_data(symbol, start_date, end_date)
+        result_data = data.stock(symbol=symbol, start_date=start_date, end_date=end_date, platform='yahoo')
 
         return result_data
 
@@ -157,7 +155,7 @@ class Toolkit:
             str: A formatted dataframe containing the stock price data for the specified ticker symbol in the specified date range.
         """
 
-        result_data = interface.get_YFin_data_online(symbol, start_date, end_date)
+        result_data = data.stock(symbol=symbol, start_date=start_date, end_date=end_date, platform='yahoo', online=True)
 
         return result_data
 
@@ -184,9 +182,7 @@ class Toolkit:
             str: A formatted dataframe containing the stock stats indicators for the specified ticker symbol and indicator.
         """
 
-        result_stockstats = interface.get_stock_stats_indicators_window(
-            symbol, indicator, curr_date, look_back_days, False
-        )
+        result_stockstats = data.technical(symbol=symbol, indicator=indicator, date=curr_date, days=look_back_days, online=False)
 
         return result_stockstats
 
@@ -213,9 +209,7 @@ class Toolkit:
             str: A formatted dataframe containing the stock stats indicators for the specified ticker symbol and indicator.
         """
 
-        result_stockstats = interface.get_stock_stats_indicators_window(
-            symbol, indicator, curr_date, look_back_days, True
-        )
+        result_stockstats = data.technical(symbol=symbol, indicator=indicator, date=curr_date, days=look_back_days, online=True)
 
         return result_stockstats
 
@@ -237,9 +231,7 @@ class Toolkit:
             str: a report of the sentiment in the past 30 days starting at curr_date
         """
 
-        data_sentiment = interface.get_finnhub_company_insider_sentiment(
-            ticker, curr_date, 30
-        )
+        data_sentiment = data.financial(symbol=ticker, data_type='insider_sentiment', date=curr_date, days=30, platform='finnhub')
 
         return data_sentiment
 
@@ -261,9 +253,7 @@ class Toolkit:
             str: a report of the company's insider transactions/trading information in the past 30 days
         """
 
-        data_trans = interface.get_finnhub_company_insider_transactions(
-            ticker, curr_date, 30
-        )
+        data_trans = data.financial(symbol=ticker, data_type='insider_transactions', date=curr_date, days=30, platform='finnhub')
 
         return data_trans
 
@@ -287,7 +277,7 @@ class Toolkit:
             str: a report of the company's most recent balance sheet
         """
 
-        data_balance_sheet = interface.get_simfin_balance_sheet(ticker, freq, curr_date)
+        data_balance_sheet = data.financial(symbol=ticker, data_type='balance_sheet', freq=freq, date=curr_date, platform='simfin')
 
         return data_balance_sheet
 
@@ -311,7 +301,7 @@ class Toolkit:
                 str: a report of the company's most recent cash flow statement
         """
 
-        data_cashflow = interface.get_simfin_cashflow(ticker, freq, curr_date)
+        data_cashflow = data.financial(symbol=ticker, data_type='cashflow', freq=freq, date=curr_date, platform='simfin')
 
         return data_cashflow
 
@@ -335,9 +325,7 @@ class Toolkit:
                 str: a report of the company's most recent income statement
         """
 
-        data_income_stmt = interface.get_simfin_income_statements(
-            ticker, freq, curr_date
-        )
+        data_income_stmt = data.financial(symbol=ticker, data_type='income_statement', freq=freq, date=curr_date, platform='simfin')
 
         return data_income_stmt
 
@@ -357,7 +345,7 @@ class Toolkit:
             str: A formatted string containing the latest news from Google News based on the query and date range.
         """
 
-        google_news_results = interface.get_google_news(query, curr_date, 7)
+        google_news_results = data.news(query=query, date=curr_date, days=7, platform='google')
 
         return google_news_results
 
@@ -376,7 +364,7 @@ class Toolkit:
             str: A formatted string containing the latest news about the company on the given date.
         """
 
-        openai_news_results = interface.get_stock_news_openai(ticker, curr_date)
+        openai_news_results = data.news(query=ticker, date=curr_date, platform='openai')
 
         return openai_news_results
 
@@ -393,7 +381,7 @@ class Toolkit:
             str: A formatted string containing the latest macroeconomic news on the given date.
         """
 
-        openai_news_results = interface.get_global_news_openai(curr_date)
+        openai_news_results = data.news(query='global', date=curr_date, platform='openai')
 
         return openai_news_results
 
@@ -412,8 +400,6 @@ class Toolkit:
             str: A formatted string containing the latest fundamental information about the company on the given date.
         """
 
-        openai_fundamentals_results = interface.get_fundamentals_openai(
-            ticker, curr_date
-        )
+        openai_fundamentals_results = data.financial(symbol=ticker, date=curr_date, platform='openai')
 
         return openai_fundamentals_results

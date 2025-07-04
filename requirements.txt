@@ -13,6 +13,7 @@ setuptools
 backtrader
 akshare
 tushare
+gm
 finnhub-python
 parsel
 requests
@@ -24,3 +25,4 @@ rich
 questionary
 langchain_anthropic
 langchain-google-genai
+python-dateutil
